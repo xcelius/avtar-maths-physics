@@ -29,11 +29,81 @@
         </div>
         <div id="result" class="result-box"></div>
     </div>
-    <script>
+        <script>
+        // 1. Get Topic ID parameter from the URL string
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
         if (id) { document.getElementById('pdf-viewer').src = `pdfs_exams/${id}.pdf`; }
         
+        // 2. MASTER ANSWER KEYS DATABASE LOOKUP
+        // Simply change these letters to your real answer keys whenever they are ready!
+        const examAnswersDatabase = {
+            // === MATHEMATICS (Forms 1 - 5: Topics mmet1a to mmet47a) ===
+            "mmet1a":  ["A", "A", "A", "A", "A"],
+            "mmet2a":  ["A", "A", "A", "A", "A"],
+            "mmet3a":  ["A", "A", "A", "A", "A"],
+            "mmet4a":  ["A", "A", "A", "A", "A"],
+            "mmet5a":  ["A", "A", "A", "A", "A"],
+            "mmet6a":  ["A", "A", "A", "A", "A"],
+            "mmet7a":  ["A", "A", "A", "A", "A"],
+            "mmet8a":  ["A", "A", "A", "A", "A"],
+            "mmet9a":  ["A", "A", "A", "A", "A"],
+            "mmet10a": ["A", "A", "A", "A", "A"],
+            "mmet11a": ["A", "A", "A", "A", "A"],
+            "mmet12a": ["A", "A", "A", "A", "A"],
+            "mmet13a": ["A", "A", "A", "A", "A"],
+            "mmet14a": ["A", "A", "A", "A", "A"],
+            "mmet15a": ["A", "A", "A", "A", "A"],
+            "mmet16a": ["A", "A", "A", "A", "A"],
+            "mmet17a": ["A", "A", "A", "A", "A"],
+            "mmet18a": ["A", "A", "A", "A", "A"],
+            "mmet19a": ["A", "A", "A", "A", "A"],
+            "mmet20a": ["A", "A", "A", "A", "A"],
+            "mmet21a": ["A", "A", "A", "A", "A"],
+            "mmet22a": ["A", "A", "A", "A", "A"],
+            "mmet23a": ["A", "A", "A", "A", "A"],
+            "mmet24a": ["A", "A", "A", "A", "A"],
+            "mmet25a": ["A", "A", "A", "A", "A"],
+            "mmet26a": ["A", "A", "A", "A", "A"],
+            "mmet27a": ["A", "A", "A", "A", "A"],
+            "mmet28a": ["A", "A", "A", "A", "A"],
+            "mmet29a": ["A", "A", "A", "A", "A"],
+            "mmet30a": ["A", "A", "A", "A", "A"],
+            "mmet31a": ["A", "A", "A", "A", "A"],
+            "mmet32a": ["A", "A", "A", "A", "A"],
+            "mmet33a": ["A", "A", "A", "A", "A"],
+            "mmet34a": ["A", "A", "A", "A", "A"],
+            "mmet35a": ["A", "A", "A", "A", "A"],
+            "mmet36a": ["A", "A", "A", "A", "A"],
+            "mmet37a": ["A", "A", "A", "A", "A"],
+            "mmet38a": ["A", "A", "A", "A", "A"],
+            "mmet39a": ["A", "A", "A", "A", "A"],
+            "mmet40a": ["A", "A", "A", "A", "A"],
+            "mmet41a": ["A", "A", "A", "A", "A"],
+            "mmet42a": ["A", "A", "A", "A", "A"],
+            "mmet43a": ["A", "A", "A", "A", "A"],
+            "mmet44a": ["A", "A", "A", "A", "A"],
+            "mmet45a": ["A", "A", "A", "A", "A"],
+            "mmet46a": ["A", "A", "A", "A", "A"],
+            "mmet47a": ["A", "A", "A", "A", "A"],
+
+            // === PHYSICS (Forms 4 - 5: Topics pmet1a to pmet13a) ===
+            "pmet1a":  ["A", "A", "A", "A", "A"],
+            "pmet2a":  ["A", "A", "A", "A", "A"],
+            "pmet3a":  ["A", "A", "A", "A", "A"],
+            "pmet4a":  ["A", "A", "A", "A", "A"],
+            "pmet5a":  ["A", "A", "A", "A", "A"],
+            "pmet6a":  ["A", "A", "A", "A", "A"],
+            "pmet7a":  ["A", "A", "A", "A", "A"],
+            "pmet8a":  ["A", "A", "A", "A", "A"],
+            "pmet9a":  ["A", "A", "A", "A", "A"],
+            "pmet10a": ["A", "A", "A", "A", "A"],
+            "pmet11a": ["A", "A", "A", "A", "A"],
+            "pmet12a": ["A", "A", "A", "A", "A"],
+            "pmet13a": ["A", "A", "A", "A", "A"]
+        };
+
+        // 3. Dynamically build the 5 row OMR sheet options
         const omr = document.getElementById('omr-target');
         for(let i=1; i<=5; i++) {
             omr.innerHTML += `<div class="question-row"><span class="question-label">Q${i}</span><div class="options">` +
@@ -41,17 +111,35 @@
                 `</div></div>`;
         }
 
+        // 4. Advanced Database Grading Engine
         function checkAnswers() {
+            const activeAnswerKeyLookup = id + "a";
+            const correctAnswersArray = examAnswersDatabase[activeAnswerKeyLookup];
+
+            if (!correctAnswersArray) {
+                alert("Error: Answer key data for this topic is missing or still being compiled.");
+                return;
+            }
+
             let score = 0;
             for (let i = 1; i <= 5; i++) {
-                const checked = document.querySelector(`input[name="q${i}"]:checked`);
-                if (checked && checked.value === 'A') score++;
+                const checkedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (checkedOption && checkedOption.value === correctAnswersArray[i - 1]) {
+                    score++;
+                }
             }
+
             const rb = document.getElementById('result');
-            rb.innerHTML = `Your Score: ${score} / 5 (${(score / 5) * 100}%)`;
+            rb.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 10px;">
+                    <span>Your Score: ${score} / 5 (${(score / 5) * 100}%)</span>
+                    <a href="mockexam.html" style="border: 2px solid #000000; background-color: #ffffff; color: #000000; font-size: 14px; font-weight: bold; padding: 8px 25px; text-decoration: none; cursor: pointer; transition: background-color 0.2s;">BACK</a>
+                </div>
+            `;
             rb.style.display = 'block';
             rb.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
+
 </body>
 </html>
