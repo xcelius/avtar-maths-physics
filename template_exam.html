@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Exam View</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #ffffff; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+        .container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+        .pdf-window { width: 100%; height: 65vh; border: 2px solid #000000; border-radius: 4px; background-color: #f9f9f9; }
+        .bottom-panel { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; width: 100%; }
+        .omr-sheet { display: flex; flex-direction: column; gap: 12px; }
+        .question-row { display: flex; align-items: center; font-size: 16px; font-weight: bold; }
+        .question-label { width: 40px; }
+        .options { display: flex; gap: 15px; }
+        .option-label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: normal; }
+        .finish-btn { border: 3px solid #000000; background-color: #ffffff; color: #000000; font-size: 16px; font-weight: bold; padding: 12px 30px; cursor: pointer; }
+        .finish-btn:hover { background-color: #000000; color: #ffffff; }
+        .result-box { display: none; margin-top: 15px; padding: 15px; border: 2px solid #000000; background-color: #f0fdf4; text-align: center; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <iframe id="pdf-viewer" class="pdf-window" src="" type="application/pdf"></iframe>
+        <div class="bottom-panel">
+            <div class="omr-sheet" id="omr-target"></div>
+            <button class="finish-btn" onclick="checkAnswers()">FINISH</button>
+        </div>
+        <div id="result" class="result-box"></div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        if (id) { document.getElementById('pdf-viewer').src = `pdfs_exams/${id}.pdf`; }
+        
+        const omr = document.getElementById('omr-target');
+        for(let i=1; i<=5; i++) {
+            omr.innerHTML += `<div class="question-row"><span class="question-label">Q${i}</span><div class="options">` +
+                `A B C D E`.split(' ').map(ch => `<label class="option-label"><input type="radio" name="q${i}" value="${ch}"> ${ch}</label>`).join('') +
+                `</div></div>`;
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            for (let i = 1; i <= 5; i++) {
+                const checked = document.querySelector(`input[name="q${i}"]:checked`);
+                if (checked && checked.value === 'A') score++;
+            }
+            const rb = document.getElementById('result');
+            rb.innerHTML = `Your Score: ${score} / 5 (${(score / 5) * 100}%)`;
+            rb.style.display = 'block';
+            rb.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
